@@ -1,0 +1,224 @@
+{% extends 'metodo/base.html' %}
+{% load static %}
+
+{% block title %}Resultados - ROW{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800">Historial de Cálculos</h2>
+        <a href="{% url 'add_falsa_posicion' %}" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors flex items-center">
+            <i class="fas fa-plus mr-2"></i> Nuevo Cálculo
+        </a>
+    </div>
+
+    {% if resultados %}
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <!-- Filtros -->
+        <div class="p-4 border-b flex flex-wrap justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <span class="text-gray-600 mr-2">Filtrar:</span>
+                <button class="filter-btn active px-3 py-1 rounded-full bg-primary text-white text-sm" data-filter="all">
+                    Todos
+                </button>
+                <button class="filter-btn px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 ml-2" data-filter="completed">
+                    Completados
+                </button>
+                <button class="filter-btn px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 ml-2" data-filter="failed">
+                    Fallidos
+                </button>
+            </div>
+            <div class="relative">
+                <input type="text" placeholder="Buscar función..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent w-full md:w-64">
+                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+        </div>
+
+        <!-- Lista de resultados -->
+        <div class="divide-y divide-gray-200">
+            {% for item in resultados %}
+            <div class="result-item p-6 hover:bg-gray-50 transition-colors {% if not item.resultado %}bg-red-50{% endif %}" data-status="{% if item.resultado %}completed{% else %}failed{% endif %}" data-id="{{ item.id }}">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="flex items-center">
+                            <h3 class="text-lg font-semibold text-gray-800 mr-3">
+                                {{ item.funcion }}
+                            </h3>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium {% if item.resultado %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {% if item.resultado %}Completado{% else %}Fallido{% endif %}
+                            </span>
+                        </div>
+                        <div class="mt-2 text-sm text-gray-600">
+                            <span class="mr-3"><i class="far fa-calendar-alt mr-1"></i> {{ item.creado|date:"d/m/Y H:i" }}</span>
+                            <span><i class="fas fa-stopwatch mr-1"></i> [{{ item.x0 }}, {{ item.x1 }}]</span>
+                        </div>
+                    </div>
+                    <button class="toggle-details text-primary hover:text-primary-dark ml-4">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                
+                <!-- Detalles desplegables -->
+                <div class="details-content hidden mt-4 pt-4 border-t">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <!-- Detalles del cálculo -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-info-circle mr-2 text-primary"></i> Detalles
+                            </h4>
+                            <ul class="space-y-2">
+                                <li class="text-sm"><span class="font-medium">Función:</span> <code>{{ item.funcion }}</code></li>
+                                <li class="text-sm"><span class="font-medium">Intervalo:</span> [{{ item.x0 }}, {{ item.x1 }}]</li>
+                                <li class="text-sm"><span class="font-medium">Tolerancia:</span> {{ item.tolerancia }}</li>
+                                <li class="text-sm"><span class="font-medium">Iteraciones:</span> {{ item.max_iteraciones }}</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Resumen -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-chart-pie mr-2 text-primary"></i> Resumen
+                            </h4>
+                            {% if item.resultado %}
+                                {% with last_line=item.resultado.splitlines|last %}
+                                <p class="text-sm mb-2"><span class="font-medium">Resultado:</span> {{ last_line|cut:"Raíz aproximada encontrada: " }}</p>
+                                {% endwith %}
+                                <p class="text-sm"><span class="font-medium">Iteraciones:</span> {{ item.resultado.splitlines|length|add:"-1" }}</p>
+                            {% else %}
+                                <p class="text-sm text-red-600">No se pudo completar el cálculo</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Acciones -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-cog mr-2 text-primary"></i> Acciones
+                            </h4>
+                            <div class="flex space-x-2">
+                                {% if item.grafico_base64 %}
+                                <button class="show-graph-btn px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200 flex items-center" 
+                                        data-graph="{{ item.grafico_base64 }}">
+                                    <i class="fas fa-chart-line mr-1"></i> Gráfica
+                                </button>
+                                {% endif %}
+                                <a href="{% url 'add_falsa_posicion' %}?clone={{ item.id }}" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 flex items-center">
+                                    <i class="fas fa-redo mr-1"></i> Reintentar
+                                </a>
+                                <button class="delete-btn px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200 flex items-center" data-id="{{ item.id }}">
+                                    <i class="fas fa-trash-alt mr-1"></i> Borrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Proceso detallado -->
+                    <div class="bg-white border rounded-lg overflow-hidden">
+                        <h4 class="font-semibold text-gray-700 p-4 border-b flex items-center">
+                            <i class="fas fa-list-ol mr-2 text-primary"></i> Proceso de Cálculo
+                        </h4>
+                        <div class="p-4 bg-gray-50">
+                            {% if item.resultado %}
+                                <div class="font-mono text-sm whitespace-pre-wrap bg-gray-800 text-gray-100 p-4 rounded overflow-x-auto">{{ item.resultado }}</div>
+                            {% else %}
+                                <p class="text-gray-500">No hay resultados disponibles para este cálculo.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl shadow-md p-8 text-center">
+        <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-calculator text-3xl text-gray-400"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">No hay cálculos registrados</h3>
+        <p class="text-gray-600 mb-6">Realiza tu primer cálculo para comenzar a ver resultados aquí.</p>
+        <a href="{% url 'add_falsa_posicion' %}" class="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors">
+            <i class="fas fa-plus mr-2"></i> Nuevo Cálculo
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de confirmación de borrado -->
+<div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full">
+        <h3 class="text-xl font-semibold mb-4">Confirmar Borrado</h3>
+        <p class="text-gray-600 mb-6">¿Estás seguro que deseas eliminar este cálculo? Esta acción no se puede deshacer.</p>
+        <div class="flex justify-end space-x-3">
+            <button id="cancel-delete" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                Cancelar
+            </button>
+            <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                Confirmar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para mostrar la gráfica -->
+<div id="graph-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-4xl w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold">Gráfica del Método</h3>
+            <button id="close-graph" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex justify-center">
+            <img id="graph-image" src="" alt="Gráfica del método" class="max-w-full max-h-[70vh]">
+        </div>
+    </div>
+</div>
+
+<style>
+    .font-mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    
+    code {
+        background-color: #f3f4f6;
+        padding: 0.2em 0.4em;
+        border-radius: 0.25rem;
+        font-family: monospace;
+        font-size: 0.9em;
+    }
+
+    /* Animaciones para el modal */
+    #delete-modal, #graph-modal {
+        transition: opacity 0.3s ease;
+    }
+
+    /* Animaciones para toast */
+    .toast {
+        animation: slideIn 0.3s forwards, fadeOut 0.5s 2.5s forwards;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+
+    /* Estilos para el modal de gráfica */
+    #graph-modal img {
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+    }
+    
+    #close-graph {
+        transition: color 0.2s ease;
+    }
+</style>
+
+<script src="{% static 'metodo/js/list.js' %}"></script>
+
+{% endblock %}

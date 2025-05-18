@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ROW - Métodos Numéricos{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        dark: '#1F2937',
+                        light: '#F9FAFB'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        logo: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .navbar-link {
+            position: relative;
+            padding-bottom: 4px;
+        }
+        
+        .navbar-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #4F46E5;
+            transition: width 0.3s ease;
+        }
+        
+        .navbar-link:hover:after {
+            width: 100%;
+        }
+
+        .user-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            min-width: 180px;
+        }
+        
+        .user-menu.active {
+            display: block;
+        }
+        
+        .user-menu-item {
+            transition: all 0.2s ease;
+        }
+        
+        .user-menu-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .rotate-180 {
+            transform: rotate(180deg);
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Navbar Moderno SOLO DESKTOP -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-logo">ROW</span>
+                </div>
+                
+                <!-- Menú Principal -->
+                <div class="flex items-center space-x-8">
+                    <a href="{% url 'inicio' %}" class="navbar-link text-gray-700 hover:text-primary transition-colors">
+                        <i class="fas fa-home mr-2"></i>Inicio
+                    </a>
+                    
+                    <!-- Menú Métodos - Versión Final Funcional -->
+                    <div class="relative" id="metodos-container">
+                        <button class="navbar-link text-gray-700 hover:text-primary transition-colors flex items-center"
+                                onclick="toggleMetodosMenu()"
+                                onmouseenter="showMetodosMenu()">
+                            <i class="fas fa-square-root-alt mr-2"></i>Métodos
+                            <i class="fas fa-chevron-down ml-1 text-xs" id="metodos-chevron"></i>
+                        </button>
+                        
+                        <div id="metodos-submenu" class="hidden absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
+                             onmouseleave="hideMetodosMenu()">
+                            <a href="{% url 'add_gauss_eliminacion' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary">
+                                <i class="fas fa-ellipsis-h mr-2 text-primary"></i>Gauss-Eliminación
+                            </a>
+                            <a href="{% url 'add_gauss_jordan' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary">
+                                <i class="fas fa-ellipsis-h mr-2 text-primary"></i>Gauss-Jordan
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'add_falsa_posicion' %}" class="navbar-link text-gray-700 hover:text-primary transition-colors">
+                        <i class="fas fa-calculator mr-2"></i>Calcular
+                    </a>
+                    <a href="{% url 'list_falsa_posicion' %}" class="navbar-link text-gray-700 hover:text-primary transition-colors">
+                        <i class="fas fa-history mr-2"></i>Resultados
+                    </a>
+                    
+                    <!-- Menú de usuario -->
+                    {% if user.is_authenticated %}
+                    <div class="relative">
+                        <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
+                            <span class="text-gray-700">{{ user.username }}</span>
+                            <i class="fas fa-user-circle text-primary text-xl"></i>
+                        </button>
+                        <div id="user-menu" class="user-menu bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="{% url 'profile' %}" class="user-menu-item block px-4 py-2 text-gray-700">
+                                <i class="fas fa-user mr-2"></i> Perfil
+                            </a>
+                            <a href="{% url 'logout' %}" class="user-menu-item block px-4 py-2 text-gray-700">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar sesión
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="flex items-center space-x-4">
+                        <a href="{% url 'login' %}" class="text-gray-700 hover:text-primary transition-colors">
+                            Iniciar sesión
+                        </a>
+                        <a href="{% url 'register' %}" class="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
+                            Registrarse
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-blue-50 text-blue-700{% endif %} flex items-start">
+                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} mr-3 mt-0.5"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                    <i class="fab fa-github text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                    <i class="fab fa-linkedin text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                    <i class="fab fa-twitter text-xl"></i>
+                </a>
+            </div>
+            <p class="text-gray-400 text-sm">
+                &copy; 2023 ROW - Métodos Numéricos. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Controlador del menú Métodos
+        let metodosTimeout;
+
+        function showMetodosMenu() {
+            clearTimeout(metodosTimeout);
+            document.getElementById('metodos-submenu').classList.remove('hidden');
+            document.getElementById('metodos-chevron').classList.add('rotate-180');
+        }
+
+        function hideMetodosMenu() {
+            metodosTimeout = setTimeout(() => {
+                document.getElementById('metodos-submenu').classList.add('hidden');
+                document.getElementById('metodos-chevron').classList.remove('rotate-180');
+            }, 300); // Retardo de 300ms para evitar cierre accidental
+        }
+
+        function toggleMetodosMenu() {
+            const menu = document.getElementById('metodos-submenu');
+            const chevron = document.getElementById('metodos-chevron');
+            
+            if (menu.classList.contains('hidden')) {
+                showMetodosMenu();
+            } else {
+                hideMetodosMenu();
+            }
+        }
+
+        // Cierra el menú si se hace clic fuera
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('metodos-container');
+            if (!container.contains(event.target)) {
+                hideMetodosMenu();
+            }
+        });
+
+        // Menú de usuario
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        
+        if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userMenu.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!userMenu.contains(e.target)) {
+                    userMenu.classList.remove('active');
+                }
+            });
+            
+            userMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+    </script>
+</body>
+</html>

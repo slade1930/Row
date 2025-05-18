@@ -1,0 +1,129 @@
+{% extends 'metodo/base.html' %}
+
+{% block title %}Inicio - ROW{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-primary to-secondary text-white py-20">
+    <div class="container mx-auto px-6 text-center">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 font-logo">ROW</h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+            Soluciones numéricas avanzadas con el método de Falsa Posición
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="{% url 'add_falsa_posicion' %}" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all transform hover:-translate-y-1 shadow-lg">
+                <i class="fas fa-play mr-2"></i>Empezar Cálculo
+            </a>
+            <a href="{% url 'list_falsa_posicion' %}" class="bg-transparent border-2 border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:bg-opacity-10 transition-all transform hover:-translate-y-1">
+                <i class="fas fa-history mr-2"></i>Ver Historial
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">¿Por qué usar ROW?</h2>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="bg-gray-50 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-primary text-4xl mb-4">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Rápido y Preciso</h3>
+                <p class="text-gray-600">
+                    Implementación optimizada del método de Falsa Posición para resultados rápidos y confiables.
+                </p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="bg-gray-50 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-primary text-4xl mb-4">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Visualización Clara</h3>
+                <p class="text-gray-600">
+                    Resultados detallados paso a paso para entender completamente el proceso de cálculo.
+                </p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="bg-gray-50 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-primary text-4xl mb-4">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Historial Completo</h3>
+                <p class="text-gray-600">
+                    Accede a todos tus cálculos anteriores en cualquier momento desde cualquier dispositivo.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Cómo funciona</h2>
+        
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-col md:flex-row gap-8 items-center mb-12">
+                <div class="md:w-1/3 text-center">
+                    <div class="bg-primary text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto text-2xl font-bold mb-4">
+                        1
+                    </div>
+                </div>
+                <div class="md:w-2/3">
+                    <h3 class="text-xl font-semibold mb-3">Ingresa tu función</h3>
+                    <p class="text-gray-600">
+                        Escribe la función matemática que deseas resolver usando la variable 'x'. Por ejemplo: <code class="bg-gray-200 px-2 py-1 rounded">x**3 - x - 2</code>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-8 items-center mb-12">
+                <div class="md:w-1/3 text-center order-last md:order-first">
+                    <div class="bg-primary text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto text-2xl font-bold mb-4">
+                        2
+                    </div>
+                </div>
+                <div class="md:w-2/3 order-first md:order-last">
+                    <h3 class="text-xl font-semibold mb-3">Define el intervalo</h3>
+                    <p class="text-gray-600">
+                        Especifica los valores iniciales x0 y x1 que contienen la raíz que buscas. El método requiere que f(x0) y f(x1) tengan signos opuestos.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <div class="md:w-1/3 text-center">
+                    <div class="bg-primary text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto text-2xl font-bold mb-4">
+                        3
+                    </div>
+                </div>
+                <div class="md:w-2/3">
+                    <h3 class="text-xl font-semibold mb-3">Obtén los resultados</h3>
+                    <p class="text-gray-600">
+                        ROW calculará la aproximación de la raíz con el método de Falsa Posición, mostrando cada iteración hasta alcanzar la precisión deseada.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">¿Listo para comenzar?</h2>
+        <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Experimenta el poder del método de Falsa Posición con ROW.
+        </p>
+        <a href="{% url 'add_falsa_posicion' %}" class="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-all transform hover:scale-105 shadow-lg inline-block">
+            <i class="fas fa-calculator mr-2"></i>Realizar un Cálculo
+        </a>
+    </div>
+</section>
+{% endblock %}
